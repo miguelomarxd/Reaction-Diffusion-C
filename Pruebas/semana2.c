@@ -84,15 +84,31 @@ void UpdateReactionDiffusion()
     {
         for (int y = 1; y < HEIGHT - 1; y++)
         {
-            float a = gridA[x][y];
-            float b = gridB[x][y];
+            float a = gridA[x][y]; // Concentración actual de A en la celda
+            float b = gridB[x][y]; // Concentración actual de B en la celda
 
+            // **Difusión**:
+            // Aproximación del operador Laplaciano:
+            // lapA y lapB calculan la difusión basada en la diferencia de concentraciones
+            // entre la celda actual y sus vecinas.
             float lapA = gridA[x-1][y] + gridA[x+1][y] + gridA[x][y-1] + gridA[x][y+1] - 4.0f * a;
             float lapB = gridB[x-1][y] + gridB[x+1][y] + gridB[x][y-1] + gridB[x][y+1] - 4.0f * b;
 
+            // **Reacción**:
+            // La reacción química modela la interacción entre las sustancias A y B.
+            // reaction = a * b^2: representa la transformación de A y B en un nuevo compuesto.
             float reaction = a * b * b;
 
+            // Actualización de la concentración de A:
+            // - lapA: efecto de difusión de A
+            // - reaction: pérdida de A debido a la reacción química
+            // - F * (1.0f - a): alimentación de A desde una fuente externa
             nextA[x][y] = a + (lapA - reaction + F * (1.0f - a)) * 0.05f;
+
+            // Actualización de la concentración de B:
+            // - lapB: efecto de difusión de B
+            // - reaction: ganancia de B a partir de la reacción química
+            // - (F + K) * b: pérdida de B debido a la eliminación y el consumo en la reacción
             nextB[x][y] = b + (lapB + reaction - (F + K) * b) * 0.05f;
         }
     }
